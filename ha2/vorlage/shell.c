@@ -8,50 +8,60 @@
 #include <errno.h>
 
 #define sep " \t"
-
+const int maxNumOfArgs = 20;
 
 char **splitArguments(char *command, int *argc);
 void freeArgs(char **args, const int argc);
 int startProcess(const int isSync);
-void runProcess(char **args, const int argc);
-void callWait(char **args, const int argc);
+void runProcess(char *path, char **args, const int argc);
+//void callWait(char **args, const int argc);
 void callCD(char **args, const int argc);
 
 int main(void)
 {
     char currentDir[2000];
     char command[2000];
-	if(getcwd(currentDir, sizeof(currentDir	)) == NULL)
-	{
-		fprintf(stderr, "Error getting current dir fprintf\n");
-		exit(errno);
-	}
 	while(1)
 	{
+        if(getcwd(currentDir, sizeof(currentDir    )) == NULL)
+        {
+            fprintf(stderr, "Error getting current dir fprintf\n");
+            exit(errno);
+        }
 		printf("%s$ ", currentDir);
         
-		gets(command);
+		fgets(command, 2000, stdin);
+        command[strlen(command) - 1] = '\0';
         
         int argc;
         char** args = splitArguments(command, &argc);
+        if(args[0] == NULL)
+        {
+            continue;
+        }
         
         if(strcmp(args[0], "cd") == 0)
         {
-            
-        } else if(strcmp(args[0], "wait") == 0)
+            printf("calling cd\n");
+            callCD(args, argc);
+        }
+        else if(strcmp(args[0], "wait") == 0)
         {
-            
-        } else if(strcmp(args[0], "exit") == 0)
+            printf ("calling wait\n");
+        }
+        else if(strcmp(args[0], "exit") == 0)
         {
+            printf("exiting\n");
             freeArgs(args, argc);
             //todo: terminate all kid processes?
             exit(0);
         }
         else
         {
-            if(startProcess(strcmp(args[argc-1], "&") == 0) == 0)
+            printf("calling program\n");
+            if(startProcess(strcmp(args[argc-1], "&") != 0) == 0)
             {
-                runProcess(args, argc);
+                runProcess(currentDir, args, argc);
             }
         }
 	}
@@ -86,7 +96,7 @@ char** splitArguments(char *command, int *p_argc)
 {
     int argc = 0;
     char *arg;
-    char **args = malloc(sizeof(char*) * 20);
+    char **args = malloc(sizeof(char*) * maxNumOfArgs);
     if(args == NULL)
     {
         fprintf(stderr, "can't split command\n");
@@ -109,25 +119,28 @@ char** splitArguments(char *command, int *p_argc)
     
     //checking if lsat symbol '&' ist concatinated to last arg
     //todo test if this step is working fine and the realloc is returning the right sizes
-    char *last = args[argc-1];
-    int lenLast = strlen(last);
-    if(lenLast > 1 && last[lenLast-1] == '&')
+    if(argc > 0)
     {
-        last[lenLast - 1] = '\0';
-        last = realloc(last, lenLast);//realloc here is shrinking no need to null check
-        //sizeof is normally len + 1 (for the '\0' symbol)
-        args[argc] = malloc(2*sizeof(char));
-        if(args == NULL)
+        char *last = args[argc-1];
+        int lenLast = strlen(last);
+        if(lenLast > 1 && last[lenLast-1] == '&')
         {
-            freeArgs(args, argc);
-            fprintf(stderr, "can't split command\n");
-            return NULL;
+            last[lenLast - 1] = '\0';
+            last = realloc(last, lenLast);//realloc here is shrinking no need to null check
+            //sizeof is normally len + 1 (for the '\0' symbol)
+            args[argc] = malloc(2*sizeof(char));
+            if(args == NULL)
+            {
+                freeArgs(args, argc);
+                fprintf(stderr, "can't split command\n");
+                return NULL;
+            }
+            args[argc][0] = '&';
+            argc++;
         }
-        args[argc][0] = '&';
-        argc++;
     }
-    
     *p_argc = argc;
+    args[argc] = NULL;
     return args;
 }
 
@@ -143,6 +156,17 @@ void freeArgs(char **args, const int argc)
 
 void callCD(char **args, const int argc)
 {
+    printf("cd to path \"%s\"\n", args[1]);
     chdir(args[1]);
 }
 
+void runProcess(char *path, char **args, const int argc)
+{
+    char ** commandArgs = malloc(sizeof(char*) * maxNumOfArgs);
+    for(int i = 0; i < argc; i++)//the i=arg[c-1] for Null arg
+    {
+        commandArgs[i] = args[i+1];
+    }
+    execv(args[0], commandArgs);
+    free(commandArgs);
+}
