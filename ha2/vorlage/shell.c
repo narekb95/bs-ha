@@ -9,6 +9,7 @@
 
 #define sep " \t"
 const int maxNumOfArgs = 20;
+const int maxCharBufferSize = 2000; //toDo: make a struct for dynamic char arrays that grows dynamically (like a vector)
 
 char **splitArguments(char *command, int *argc);
 void freeArgs(char **args, const int argc);
@@ -19,8 +20,8 @@ void callCD(char **args, const int argc);
 
 int main(void)
 {
-    char currentDir[2000];
-    char command[2000];
+    char currentDir[maxCharBufferSize];
+    char command[maxCharBufferSize];
 	while(1)
 	{
         if(getcwd(currentDir, sizeof(currentDir    )) == NULL)
@@ -30,7 +31,7 @@ int main(void)
         }
 		printf("%s$ ", currentDir);
         
-		fgets(command, 2000, stdin);
+		fgets(command, maxCharBufferSize, stdin);
         command[strlen(command) - 1] = '\0';
         
         int argc;
@@ -42,7 +43,6 @@ int main(void)
         
         if(strcmp(args[0], "cd") == 0)
         {
-            printf("calling cd\n");
             callCD(args, argc);
         }
         else if(strcmp(args[0], "wait") == 0)
@@ -51,17 +51,19 @@ int main(void)
         }
         else if(strcmp(args[0], "exit") == 0)
         {
-            printf("exiting\n");
             freeArgs(args, argc);
             //todo: terminate all kid processes?
             exit(0);
         }
         else
         {
-            printf("calling program\n");
             if(startProcess(strcmp(args[argc-1], "&") != 0) == 0)
             {
-                runProcess(currentDir, args, argc);
+                char *commandToCall = args[0];
+                args[0] = currentDir;
+                runProcess(commandToCall, args, argc);
+                free(commandToCall);
+                args[0] = NULL;
             }
         }
 	}
@@ -160,13 +162,14 @@ void callCD(char **args, const int argc)
     chdir(args[1]);
 }
 
-void runProcess(char *path, char **args, const int argc)
+void runProcess(char *command, char **args, const int argc)
 {
-    char ** commandArgs = malloc(sizeof(char*) * maxNumOfArgs);
-    for(int i = 0; i < argc; i++)//the i=arg[c-1] for Null arg
+    printf("%s\n", command);
+    int i;
+    for(i = 0; args[i] != NULL; i++)
     {
-        commandArgs[i] = args[i+1];
+        printf("%s ", args[i]);
     }
-    execv(args[0], commandArgs);
-    free(commandArgs);
+    printf("\n");
+    execvp(command, args);
 }
