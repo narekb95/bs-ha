@@ -14,8 +14,8 @@ char** splitArguments(char *command, int &argc);
 void freeArgs(char **args, const int& argc);
 int startProcess(const int& isSync);
 void runProcess(const char **command);
-void callWait(const char **command)
-void callCD(const char **command)
+void callWait(const char **command);
+void callCD(const char **command);
 
 int main(void)
 {
@@ -43,7 +43,9 @@ int main(void)
             
         } else if(strcmp(args[0], "exit") == 0)
         {
-            
+            freeArgs(args, argc);
+            //todo: terminate all kid processes?
+            exit(0);
         }
         else
         {
@@ -66,12 +68,20 @@ int startProcess(int isSync)
         fprintf(stderr, "can't start new process\n");
         return;
     }
-    if(isSync && pid > 0)
+    
+    if(pid > 0)
     {
-        int status;
-        wait(status);
+        if(isSync && pid > 0)
+        {
+            int status;
+            wait(status);
+        }
+        else
+        {
+            printf("[%d]\n", pid);
+        }
     }
-    return return pid;
+    return pid;//calling function is responsible to handle as a parent or child
 }
 
 char** splitArguments(char *command, int &argc)
@@ -98,6 +108,27 @@ char** splitArguments(char *command, int &argc)
         argc++;
         arg = strtok(NULL, arg);
     }
+    
+    //checking if lsat symbol '&' ist concatinated to last arg
+    //todo test if this step is working fine and the realloc is returning the right sizes
+    char *last = args[strlen-1];
+    int lenLast = strlen(last);
+    if(lenLast > 1 && last[lenLast-1] == '&')
+    {
+        last[lenLast - 1] = '\0';
+        last = realloc(last, lenLast);//realloc here is shrinking no need to null check
+        //sizeof is normally len + 1 (for the '\0' symbol)
+        args[argc] = malloc(2*sizeof(char));
+        if(args == NULL)
+        {
+            freeArgs(args, argc);
+            fprintf(stderr, "can't split command\n");
+            return NULL;
+        }
+        args[argc][0] = '&';
+        argc++;
+    }
+    
     return args;
 }
 
@@ -109,5 +140,10 @@ void freeArgs(char **args, const int& argc)
         free(args[i]);
     }
     free(args);
+}
+
+void callCD(const char **command)
+{
+    chdir(command[1]);
 }
 
