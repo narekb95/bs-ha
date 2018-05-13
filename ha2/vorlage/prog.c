@@ -51,6 +51,6 @@ int main(int argc, const char* argv[])
 	
 	printf("Delay: %ds, Exit Code: %d\n", delay, rc);
 	sleep(delay);
-	
+	printf("Ending\n");
 	return rc;
 }

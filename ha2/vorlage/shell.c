@@ -14,7 +14,6 @@ const int maxCharBufferSize = 2000; //toDo: make a struct for dynamic char array
 char **splitArguments(char *command, int *argc);
 void freeArgs(char **args, const int argc);
 int startProcess(const int isSync);
-void runProcess(char *path, char **args, const int argc);
 //void callWait(char **args, const int argc);
 void callCD(char **args, const int argc);
 
@@ -61,9 +60,8 @@ int main(void)
             {
                 char *commandToCall = args[0];
                 args[0] = currentDir;
-                runProcess(commandToCall, args, argc);
-                free(commandToCall);
-                args[0] = NULL;
+                execvp(commandToCall, args);
+                args[0] = commandToCall;
             }
         }
 	}
@@ -81,7 +79,7 @@ int startProcess(int isSync)
     }
     else if(pid > 0)
     {
-        if(isSync && pid > 0)
+        if(isSync)
         {
             int status;
             wait(&status);
@@ -158,18 +156,5 @@ void freeArgs(char **args, const int argc)
 
 void callCD(char **args, const int argc)
 {
-    printf("cd to path \"%s\"\n", args[1]);
     chdir(args[1]);
-}
-
-void runProcess(char *command, char **args, const int argc)
-{
-    printf("%s\n", command);
-    int i;
-    for(i = 0; args[i] != NULL; i++)
-    {
-        printf("%s ", args[i]);
-    }
-    printf("\n");
-    execvp(command, args);
 }
