@@ -8,17 +8,32 @@
 #include <errno.h>
 
 #define sep " \t"
+int done = 0;
 const int maxNumOfArgs = 20;
 const int maxCharBufferSize = 2000; //toDo: make a struct for dynamic char arrays that grows dynamically (like a vector)
 
-char **splitArguments(char *command, int *argc);
+char** splitArguments(char *command, int *p_argc, int *p_isSync);
 void freeArgs(char **args, const int argc);
 int startProcess(const int isSync);
-//void callWait(char **args, const int argc);
+void callWait(char **args, const int argc);
 void callCD(char **args, const int argc);
 
+
+void sigintHandler(int sig_num)
+{
+    signal(SIGINT, sigintHandler);
+    done = 1;
+}
+void terminatedChildhandler(int sig)
+{
+    signal(SIGCHLD, terminatedChildhandler);
+    printf("handling sigchld %d\n", sig);
+    wait(0);
+}
 int main(void)
 {
+    signal(SIGINT, sigintHandler);
+    signal(SIGCHLD, terminatedChildhandler);
     char currentDir[maxCharBufferSize];
     char command[maxCharBufferSize];
 	while(1)
@@ -26,7 +41,7 @@ int main(void)
         if(getcwd(currentDir, sizeof(currentDir    )) == NULL)
         {
             fprintf(stderr, "Error getting current dir fprintf\n");
-            exit(errno);
+            return(errno);
         }
 		printf("%s$ ", currentDir);
         
@@ -34,7 +49,8 @@ int main(void)
         command[strlen(command) - 1] = '\0';
         
         int argc;
-        char** args = splitArguments(command, &argc);
+        int isSync;
+        char** args = splitArguments(command, &argc, &isSync);
         if(args[0] == NULL)
         {
             continue;
@@ -46,7 +62,7 @@ int main(void)
         }
         else if(strcmp(args[0], "wait") == 0)
         {
-            printf ("calling wait\n");
+            callWait(args, argc);
         }
         else if(strcmp(args[0], "exit") == 0)
         {
@@ -56,14 +72,13 @@ int main(void)
         }
         else
         {
-            if(startProcess(strcmp(args[argc-1], "&") != 0) == 0)
+            if(startProcess(isSync) == 0)
             {
-                char *commandToCall = args[0];
-                args[0] = currentDir;
-                execvp(commandToCall, args);
-                args[0] = commandToCall;
+                printf("is sync: %d\n", isSync);
+                execvp(args[0], args);
             }
         }
+        done = 0;
 	}
     
 	return 0;
@@ -92,9 +107,10 @@ int startProcess(int isSync)
     return pid;//calling function is responsible to handle as a parent or child
 }
 
-char** splitArguments(char *command, int *p_argc)
+char** splitArguments(char *command, int *p_argc, int *p_isSync)
 {
     int argc = 0;
+    int isSync = 1;
     char *arg;
     char **args = malloc(sizeof(char*) * maxNumOfArgs);
     if(args == NULL)
@@ -117,29 +133,29 @@ char** splitArguments(char *command, int *p_argc)
         arg = strtok(NULL, sep);
     }
     
-    //checking if lsat symbol '&' ist concatinated to last arg
-    //todo test if this step is working fine and the realloc is returning the right sizes
+    //check if last argument is "&" or the symbol is concatinated to last argument
     if(argc > 0)
     {
         char *last = args[argc-1];
         int lenLast = strlen(last);
-        if(lenLast > 1 && last[lenLast-1] == '&')
+        if(strcmp(last, "&") == 0)
         {
-            last[lenLast - 1] = '\0';
-            last = realloc(last, lenLast);//realloc here is shrinking no need to null check
-            //sizeof is normally len + 1 (for the '\0' symbol)
-            args[argc] = malloc(2*sizeof(char));
-            if(args == NULL)
+            argc--;
+            free(args[argc]);
+            isSync = 0;
+        }
+        else
+        {
+            if(lenLast > 1 && last[lenLast-1] == '&')
             {
-                freeArgs(args, argc);
-                fprintf(stderr, "can't split command\n");
-                return NULL;
+                isSync = 0;
+                last[lenLast - 1] = '\0';
             }
-            args[argc][0] = '&';
-            argc++;
+            
         }
     }
     *p_argc = argc;
+    *p_isSync = isSync;
     args[argc] = NULL;
     return args;
 }
@@ -157,4 +173,29 @@ void freeArgs(char **args, const int argc)
 void callCD(char **args, const int argc)
 {
     chdir(args[1]);
+}
+
+void callWait(char **args, const int argc)
+{
+    int i;
+    int stillToBeStopped = argc - 1;
+    while(stillToBeStopped)
+    {
+        for(i = 1; i < argc; i++)
+        {
+            int stat;
+            int pid = atoi(args[i]);
+            if(waitpid(pid, &stat, WNOHANG) == pid)//check if -1
+            {
+                stillToBeStopped--;
+                printf("Porcess %d done, still habe %d to go\n", pid, stillToBeStopped);
+            }
+        }
+        if(done)
+        {            printf("not waiting anymore\n");
+
+            break;
+        }
+    }
+    printf("exiting call wait with c = %d\n" ,stillToBeStopped);
 }
