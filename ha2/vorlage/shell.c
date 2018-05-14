@@ -28,13 +28,10 @@ void sigintHandler(int sig_num)
 }
 void terminatedChildhandler(int sig)
 {
-    //signal(SIGCHLD, terminatedChildhandler);
-    printf("handling sigchld %d\n", sig);
     int   status;
     int pid;
     while((pid = waitpid(-1, &status, WNOHANG)) > 0)
     {
-        printf("reseting child %d\n", pid);
         runningpids[pid] = 0;   // Or whatever you need to do with the PID
     }
 }
@@ -48,7 +45,7 @@ int main(void)
 	{
         if(getcwd(currentDir, sizeof(currentDir    )) == NULL)
         {
-            fprintf(stderr, "Error getting current dir fprintf\n");
+            fprintf(stderr, "Error getting current dir\n");
             return(errno);
         }
 		printf("%s$ ", currentDir);
@@ -82,7 +79,6 @@ int main(void)
         {
             if(startProcess(isSync) == 0)
             {
-                printf("is sync: %d\n", isSync);
                 execvp(args[0], args);
             }
         }
@@ -192,15 +188,12 @@ void callWait(char **args, const int argc)
     
     for(i = 1; i < argc; i++)
     {
-        printf("process %s ", args[i]);
         if(runningpids[atoi(args[i])])
         {
-            printf("is rnning\n");
             stillToBeStopped++;
         }
         else
         {
-            printf("is already stopped\n");
             args[i][0] = '\0';
         }
     }
@@ -219,14 +212,11 @@ void callWait(char **args, const int argc)
             {
                 args[i][0] = '\0';
                 stillToBeStopped--;
-                printf("Porcess %d done, still habe %d to go\n", pid, stillToBeStopped);
             }
         }
         if(done)
         {
-            printf("not waiting anymore\n");
             break;
         }
     }
-    printf("exiting wait with c = %d\n" ,stillToBeStopped);
 }
