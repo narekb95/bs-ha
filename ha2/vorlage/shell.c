@@ -12,6 +12,8 @@ int done = 0;
 const int maxNumOfArgs = 20;
 const int maxCharBufferSize = 2000; //toDo: make a struct for dynamic char arrays that grows dynamically (like a vector)
 
+int runningpids[210005];
+
 char** splitArguments(char *command, int *p_argc, int *p_isSync);
 void freeArgs(char **args, const int argc);
 int startProcess(const int isSync);
@@ -26,9 +28,15 @@ void sigintHandler(int sig_num)
 }
 void terminatedChildhandler(int sig)
 {
-    signal(SIGCHLD, terminatedChildhandler);
+    //signal(SIGCHLD, terminatedChildhandler);
     printf("handling sigchld %d\n", sig);
-    wait(0);
+    int   status;
+    int pid;
+    while((pid = waitpid(-1, &status, WNOHANG)) > 0)
+    {
+        printf("reseting child %d\n", pid);
+        runningpids[pid] = 0;   // Or whatever you need to do with the PID
+    }
 }
 int main(void)
 {
@@ -94,6 +102,8 @@ int startProcess(int isSync)
     }
     else if(pid > 0)
     {
+        
+        runningpids[pid] = 1;
         if(isSync)
         {
             int status;
@@ -178,24 +188,45 @@ void callCD(char **args, const int argc)
 void callWait(char **args, const int argc)
 {
     int i;
-    int stillToBeStopped = argc - 1;
+    int stillToBeStopped = 0;
+    
+    for(i = 1; i < argc; i++)
+    {
+        printf("process %s ", args[i]);
+        if(runningpids[atoi(args[i])])
+        {
+            printf("is rnning\n");
+            stillToBeStopped++;
+        }
+        else
+        {
+            printf("is already stopped\n");
+            args[i][0] = '\0';
+        }
+    }
+    
     while(stillToBeStopped)
     {
+        usleep(10000);
         for(i = 1; i < argc; i++)
         {
-            int stat;
-            int pid = atoi(args[i]);
-            if(waitpid(pid, &stat, WNOHANG) == pid)//check if -1
+            if(args[i][0] == '\0')
             {
+                continue;
+            }
+            int pid = atoi(args[i]);
+            if(runningpids[pid] == 0)
+            {
+                args[i][0] = '\0';
                 stillToBeStopped--;
                 printf("Porcess %d done, still habe %d to go\n", pid, stillToBeStopped);
             }
         }
         if(done)
-        {            printf("not waiting anymore\n");
-
+        {
+            printf("not waiting anymore\n");
             break;
         }
     }
-    printf("exiting call wait with c = %d\n" ,stillToBeStopped);
+    printf("exiting wait with c = %d\n" ,stillToBeStopped);
 }
