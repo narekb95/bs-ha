@@ -1,3 +1,5 @@
+//todo: try different variants of exec (real shell doesn't close background things on ctrl+c
+//todo: accept more than one pipe (max args array of array of array of chars [command][args][string] and pipe args[i] to args[i+1]
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,7 +25,7 @@ void callCD(char **args, const int argc);
 
 void sigintHandler(int sig_num)
 {
-    signal(SIGINT, sigintHandler);
+    //signal(SIGINT, sigintHandler); todo:test
     done = 1;
 }
 void terminatedChildhandler(int sig)
@@ -61,7 +63,67 @@ int main(void)
             continue;
         }
         
-        if(strcmp(args[0], "cd") == 0)
+        int i;
+        for(i = 0; i < argc; i++)
+        {
+            if(strcmp(args[i], "|") == 0)
+            {
+                break;
+            }
+        }
+        if(i != argc)
+        {
+            char **args1, **args2;
+            args1 = malloc(sizeof(char*) * (maxNumOfArgs/2));
+            args2 = malloc(sizeof(char*) * (maxNumOfArgs/2));
+            if(args1 == NULL || args2 == NULL)
+            {
+                free(args1);
+                free(args2);
+                fprintf(stdout, "can't run pipe commands\n");
+                return 1;
+            }
+            
+            int j;
+            for(j = 0; j < i; j++)
+            {
+                args1[j] = args[j];
+            }
+            args1[j] = NULL;
+            for(j = i + 1; j < argc; j++)
+            {
+                args2[j - i - 1] = args[j];
+            }
+            args2[j-i-1] = NULL;
+            
+            int id1, id2;
+            int fd[2];
+            pipe(fd);
+            if((id1 = startProcess(0)) == 0)
+            {
+                close(fd[0]);
+                dup2(fd[1], 1);
+                execvp(args1[0], args1);
+            }
+            if((id2 = startProcess(0)) == 0)
+            {
+                close(fd[1]);
+                dup2(fd[0], 0);
+                execvp(args2[0], args2);
+            }
+            if(isSync)
+            {
+                int stat;
+                waitpid(id1, &stat, 0);
+                waitpid(id2, &stat, 0);
+            }
+            else
+            {
+                printf("[%d]\n", id1);
+                printf("[%d]\n", id2);
+            }
+        }
+        else if(strcmp(args[0], "cd") == 0)
         {
             callCD(args, argc);
         }
@@ -77,9 +139,22 @@ int main(void)
         }
         else
         {
-            if(startProcess(isSync) == 0)
+            int pid;
+            if((pid = startProcess(isSync)) == 0)
             {
                 execvp(args[0], args);
+            }
+            else
+            {
+                if(isSync)
+                {
+                    int status;
+                    waitpid(pid, &status, 0);
+                }
+                else
+                {
+                    printf("[%d]\n", pid);
+                }
             }
         }
         done = 0;
@@ -100,15 +175,6 @@ int startProcess(int isSync)
     {
         
         runningpids[pid] = 1;
-        if(isSync)
-        {
-            int status;
-            wait(&status);
-        }
-        else
-        {
-            printf("[%d]\n", pid);
-        }
     }
     return pid;//calling function is responsible to handle as a parent or child
 }
