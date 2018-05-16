@@ -105,6 +105,8 @@ int main(void)
                 dup2(fd[1], 1);
                 close(fd[1]);
                 execvp(args1[0], args1);
+                fprintf(stderr, "Error calling command: %s\n", args1[0]);
+                exit(1);
             }
             if((id2 = startProcess()) == 0)
             {
@@ -112,6 +114,8 @@ int main(void)
                 dup2(fd[0], 0);
                 close(fd[0]);
                 execvp(args2[0], args2);
+                fprintf(stderr, "Error calling command: %s\n", args2[0]);
+                exit(1);
             }
             close(fd[0]);
             close(fd[1]);
@@ -147,6 +151,8 @@ int main(void)
             if((pid = startProcess()) == 0)
             {
                 execvp(args[0], args);
+                fprintf(stderr, "Error calling command: %s\n", args[0]);
+                exit(1);
             }
             else
             {
