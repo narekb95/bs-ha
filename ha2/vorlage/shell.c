@@ -1,4 +1,3 @@
-//todo: try different variants of exec (real shell doesn't close background things on ctrl+c
 //todo: accept more than one pipe (max args array of array of array of chars [command][args][string] and pipe args[i] to args[i+1]
 //todo: make num of args dynamic
 #include <stdio.h>
@@ -142,7 +141,6 @@ int main(void)
         else if(strcmp(args[0], "exit") == 0)
         {
             freeArgs(args, argc);
-            //todo: terminate all kid processes?
             exit(0);
         }
         else
