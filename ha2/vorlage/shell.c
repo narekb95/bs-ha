@@ -18,7 +18,7 @@ int runningpids[210005];
 
 char** splitArguments(char *command, int *p_argc, int *p_isSync);
 void freeArgs(char **args, const int argc);
-int startProcess(const int isSync);
+int startProcess();
 void callWait(char **args, const int argc);
 void callCD(char **args, const int argc);
 
@@ -99,18 +99,22 @@ int main(void)
             int id1, id2;
             int fd[2];
             pipe(fd);
-            if((id1 = startProcess(0)) == 0)
+            if((id1 = startProcess()) == 0)
             {
                 close(fd[0]);
                 dup2(fd[1], 1);
+                close(fd[1]);
                 execvp(args1[0], args1);
             }
-            if((id2 = startProcess(0)) == 0)
+            if((id2 = startProcess()) == 0)
             {
                 close(fd[1]);
                 dup2(fd[0], 0);
+                close(fd[0]);
                 execvp(args2[0], args2);
             }
+            close(fd[0]);
+            close(fd[1]);
             if(isSync)
             {
                 int stat;
@@ -140,7 +144,7 @@ int main(void)
         else
         {
             int pid;
-            if((pid = startProcess(isSync)) == 0)
+            if((pid = startProcess()) == 0)
             {
                 execvp(args[0], args);
             }
@@ -164,7 +168,7 @@ int main(void)
 }
 
 
-int startProcess(int isSync)
+int startProcess()
 {
     int pid = fork();
     if(pid < 0)
