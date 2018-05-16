@@ -1,5 +1,6 @@
 //todo: try different variants of exec (real shell doesn't close background things on ctrl+c
 //todo: accept more than one pipe (max args array of array of array of chars [command][args][string] and pipe args[i] to args[i+1]
+//todo: make num of args dynamic
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -12,7 +13,7 @@
 #define sep " \t"
 int done = 0;
 const int maxNumOfArgs = 20;
-const int maxCharBufferSize = 2000; //toDo: make a struct for dynamic char arrays that grows dynamically (like a vector)
+const int maxCharBufferSize = 2000;
 
 int runningpids[210005];
 
@@ -25,7 +26,6 @@ void callCD(char **args, const int argc);
 
 void sigintHandler(int sig_num)
 {
-    //signal(SIGINT, sigintHandler); todo:test
     done = 1;
 }
 void terminatedChildhandler(int sig)
@@ -34,7 +34,7 @@ void terminatedChildhandler(int sig)
     int pid;
     while((pid = waitpid(-1, &status, WNOHANG)) > 0)
     {
-        runningpids[pid] = 0;   // Or whatever you need to do with the PID
+        runningpids[pid] = 0;
     }
 }
 int main(void)
@@ -180,7 +180,7 @@ int startProcess()
         
         runningpids[pid] = 1;
     }
-    return pid;//calling function is responsible to handle as a parent or child
+    return pid;
 }
 
 char** splitArguments(char *command, int *p_argc, int *p_isSync)
@@ -209,7 +209,6 @@ char** splitArguments(char *command, int *p_argc, int *p_isSync)
         arg = strtok(NULL, sep);
     }
     
-    //check if last argument is "&" or the symbol is concatinated to last argument
     if(argc > 0)
     {
         char *last = args[argc-1];
