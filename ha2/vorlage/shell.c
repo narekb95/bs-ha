@@ -51,7 +51,10 @@ int main(void)
         }
 		printf("%s$ ", currentDir);
         
-		fgets(command, maxCharBufferSize, stdin);
+	if(fgets(command, maxCharBufferSize, stdin) == NULL)
+	{
+		fprintf(stderr, "can't read command, please try again\n");
+	}
         command[strlen(command) - 1] = '\0';
         
         int argc;
@@ -97,7 +100,11 @@ int main(void)
             
             int id1, id2;
             int fd[2];
-            pipe(fd);
+            if(pipe(fd) == 0)
+	    {
+		fprintf(stderr, "can't create pipe\n");
+		return 1;
+	    }
             if((id1 = startProcess()) == 0)
             {
                 close(fd[0]);
@@ -251,7 +258,10 @@ void freeArgs(char **args, const int argc)
 
 void callCD(char **args, const int argc)
 {
-    chdir(args[1]);
+    if(chdir(args[1]) != 0)
+    {
+	fprintf(stderr, "can't open directory\n");
+    }
 }
 
 void callWait(char **args, const int argc)
