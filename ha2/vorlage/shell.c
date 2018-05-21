@@ -100,7 +100,7 @@ int main(void)
             
             int id1, id2;
             int fd[2];
-            if(pipe(fd) == 0)
+            if(pipe(fd) != 0)
 	    {
 		fprintf(stderr, "can't create pipe\n");
 		return 1;
