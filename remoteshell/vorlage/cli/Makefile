@@ -4,11 +4,10 @@ TAR = client
 SRC = $(wildcard *.c)
 OBJ = $(SRC:%.c=%.o)
 
-%.o: %.c %.h
-	$(CC) $(CFLAGS) $< -o $@
+CFLAGS = -O2
 
 %.o: %.c
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) -c $<
 
 client: $(OBJ)
 	$(CC) $^ -o $@
@@ -17,3 +16,6 @@ all: $(TAR)
 
 clean:
 	$(RM) $(RMFILES) $(OBJ) $(TAR)
+
+debug: CFLAGS += -DDEBUG -g
+debug: all

@@ -7,8 +7,12 @@
 #include <sys/wait.h>
 #include <errno.h>
 
-#define PORT 9000
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
+const int PORT = 8000;
+const int STPORT = 5020;
 #define sep " \t"
 int done = 0;
 const int maxNumOfArgs = 20;
@@ -25,6 +29,7 @@ void startShell(int port);
 void sigintHandler(int sig_num);
 static void die(const char* msg);
 
+//always close file descriptors and free char arrays [todo]
 int main(void)
 {
 
@@ -35,25 +40,38 @@ int main(void)
     char buf[256];
     
     srv_addr.sin_family = AF_INET;
-    srv_addr.sin_port = htons(8000);
+    srv_addr.sin_port = htons(PORT);
     srv_addr.sin_addr.s_addr = INADDR_ANY;
+#ifdef DEBUG
+    printf("0\n");
+#endif
     
     if ((sfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         die("Couldn't open the socket");
     }
+#ifdef DEBUG
+    printf("1\n");
+#endif
     
     if (bind(sfd, (struct sockaddr*) &srv_addr, sad_sz) < 0)
     {
         die("Couldn't bind socket");
     }
+#ifdef DEBUG
+    printf("2\n");
+#endif
     
     if (listen(sfd, 1) < 0)
     {
         die("Couldn't listen to the socket");
     }
-    int port = 5000;
-    int pid
+#ifdef DEBUG
+    printf("3\n");
+#endif
+    
+    int port = STPORT;
+    int pid;
     while(1)
     {
         
@@ -74,6 +92,9 @@ int main(void)
         }
         port++;
     }
+    
+    close(cfd);
+    close(sfd);
     return 0;
 }
 
@@ -250,26 +271,77 @@ void startShell(int port)
     signal(SIGCHLD, terminatedChildhandler);
     char currentDir[maxCharBufferSize];
     char command[maxCharBufferSize];
+    
+    
+    
+    struct sockaddr_in srv_addr, cli_addr;
+    socklen_t sad_sz = sizeof(struct sockaddr_in);
+    int sfd, cfd;
+    ssize_t bytes;
+    char buf[256];
+    
+    srv_addr.sin_family = AF_INET;
+    srv_addr.sin_port = htons(port);
+    srv_addr.sin_addr.s_addr = INADDR_ANY;
+    
+    if ((sfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+        die("Couldn't open the socket");
+    }
+    
+    if (bind(sfd, (struct sockaddr*) &srv_addr, sad_sz) < 0)
+    {
+        die("Couldn't bind socket");
+    }
+    
+    if (listen(sfd, 1) < 0)
+    {
+        die("Couldn't listen to the socket");
+    }
+    
+    cfd = accept(sfd, (struct sockaddr*) &cli_addr, &sad_sz);
+    if (cfd < 0)
+    {
+        die("Couldn't accept incoming connection");
+    }
+    dup2(cfd, STDOUT_FILENO);
     while(1)
     {
         if(getcwd(currentDir, sizeof(currentDir    )) == NULL)
         {
             fprintf(stderr, "Error getting current dir\n");
-            return(errno);
+            exit (errno);
         }
-        printf("%s$ ", currentDir);
-        
-        if(fgets(command, maxCharBufferSize, stdin) == NULL)
+        if (write(cfd, currentDir, strlen(currentDir)) < 0)
         {
-            fprintf(stderr, "can't read command, please try again\n");
+            die("Couldn't send message");
         }
+        
+        int bytesRead;
+        if ((bytesRead = read(cfd, command, maxCharBufferSize-1)) < 0)
+        {
+            die("Couldn't read message, please try again");
+            continue;
+        }
+        command[bytesRead] = '\0';
+        
         command[strlen(command) - 1] = '\0';
+#ifdef DEBUG
+        fprintf(stderr, "read command: \"%s\"\n", command);
+#endif
         
         int argc;
         int isSync;
         char** args = splitArguments(command, &argc, &isSync);
         if(args[0] == NULL)
         {
+#ifdef DEBUG
+            fprintf(stderr, "no command\n");
+#endif
+            if (write(cfd, "done!", strlen("done!")) < 0)
+            {
+                die("Couldn't send message");
+            }
             continue;
         }
         
@@ -283,6 +355,9 @@ void startShell(int port)
         }
         if(i != argc)
         {
+#ifdef DEBUG
+            fprintf(stderr, "pipe\n");
+#endif
             char **args1, **args2;
             args1 = malloc(sizeof(char*) * (maxNumOfArgs/2));
             args2 = malloc(sizeof(char*) * (maxNumOfArgs/2));
@@ -291,7 +366,7 @@ void startShell(int port)
                 free(args1);
                 free(args2);
                 fprintf(stdout, "can't run pipe commands\n");
-                return 1;
+                exit (1);
             }
             
             int j;
@@ -311,7 +386,7 @@ void startShell(int port)
             if(pipe(fd) != 0)
             {
                 fprintf(stderr, "can't create pipe\n");
-                return 1;
+                exit(1);
             }
             if((id1 = startProcess()) == 0)
             {
@@ -347,14 +422,23 @@ void startShell(int port)
         }
         else if(strcmp(args[0], "cd") == 0)
         {
+#ifdef DEBUG
+            fprintf(stderr, "cd branch\n");
+#endif
             callCD(args, argc);
         }
         else if(strcmp(args[0], "wait") == 0)
         {
+#ifdef DEBUG
+            fprintf(stderr, "wait branch\n");
+#endif
             callWait(args, argc);
         }
         else if(strcmp(args[0], "exit") == 0)
         {
+#ifdef DEBUG
+            fprintf(stderr, "exit branch\n");
+#endif
             freeArgs(args, argc);
             exit(0);
         }
@@ -363,8 +447,9 @@ void startShell(int port)
             int pid;
             if((pid = startProcess()) == 0)
             {
+                fprintf(stderr,"calling command \"%s\"\n", args[0]);
                 execvp(args[0], args);
-                fprintf(stderr, "Error calling command: %s\n", args[0]);
+                fprintf(stderr, "Error calling command:\"%s\"\n", args[0]);
                 exit(1);
             }
             else
@@ -381,6 +466,10 @@ void startShell(int port)
             }
         }
         done = 0;
+        if (write(cfd, "done!", strlen("done!")) < 0)
+        {
+            die("Couldn't send message");
+        }
     }
 }
 
