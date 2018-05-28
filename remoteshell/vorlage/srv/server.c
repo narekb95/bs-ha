@@ -1,3 +1,4 @@
+//done has always done as reply (a hand shake)
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -11,8 +12,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-const int PORT = 8000;
-const int STPORT = 5020;
+const int PORT = 8002;
+const int STPORT = 5023;
 #define sep " \t"
 int done = 0;
 const int maxNumOfArgs = 20;
@@ -28,6 +29,7 @@ char *itoa(int x);
 void startShell(int port);
 void sigintHandler(int sig_num);
 static void die(const char* msg);
+int endsWithDone(const char* str);
 
 //always close file descriptors and free char arrays [todo]
 int main(void)
@@ -323,6 +325,10 @@ void startShell(int port)
             die("Couldn't read message, please try again");
             continue;
         }
+        if(write(cfd, "done!", sizeof("done!")) < 0)
+        {
+            die("can't reply done\n");
+        }
         command[bytesRead] = '\0';
         
         command[strlen(command) - 1] = '\0';
@@ -337,10 +343,18 @@ void startShell(int port)
         {
 #ifdef DEBUG
             fprintf(stderr, "no command\n");
+            fprintf(stderr, "writing done!!\n");
 #endif
             if (write(cfd, "done!", strlen("done!")) < 0)
             {
                 die("Couldn't send message");
+            }
+#ifdef DEBUG
+            fprintf(stderr, "waiting for done reply\n");
+#endif
+            if (read(cfd, command, maxCharBufferSize) < 0)
+            {
+                die("continue\n");
             }
             continue;
         }
@@ -440,14 +454,71 @@ void startShell(int port)
             fprintf(stderr, "exit branch\n");
 #endif
             freeArgs(args, argc);
+            close(cfd);
             exit(0);
+        }
+        else if(strcmp(args[0], "put") == 0)
+        {
+#ifdef DEBUG
+            fprintf(stderr, "put branch in file \"%s\"\n", args[1]);
+#endif
+            FILE *file = fopen(args[1], "w");
+            if(file == NULL)
+            {
+                die("Couldn't open file to write\n");
+                continue;
+            }
+            int bytesRead;
+            char *txt = malloc(maxCharBufferSize);
+            if(txt == NULL)
+            {
+                die("can't allocat char array\n");
+                return;
+            }
+            while(1)
+            {
+                if ((bytesRead = read(cfd, txt, maxCharBufferSize-1)) < 0)
+                {
+                    die("Couldn't read message, please try again");
+                }
+                txt[bytesRead] = '\0';
+                if(endsWithDone(txt))
+                {
+#ifdef DEBUG
+                    fprintf(stderr, "done writing\n");
+#endif
+                    if (write(cfd, "done!", strlen("done!")) < 0)
+                    {
+                        die("couldn't reply done");
+                    }
+                    if ((bytesRead = read(cfd, txt, maxCharBufferSize-1)) < 0)
+                    {
+                        die("Couldn't read message, please try again");
+                    }
+                    break;
+                }
+#ifdef DEBUG
+                fprintf(stderr, "writing..\n");
+                fprintf(stderr, "%s", txt);
+#endif
+                fprintf(file, "%s", txt);
+            }
+            fclose(file);
+        }
+        else if(strcmp(args[0], "get") == 0)
+        {
+#ifdef DEBUG
+            fprintf(stderr, "get branch\n");
+#endif
         }
         else
         {
             int pid;
             if((pid = startProcess()) == 0)
             {
+#ifdef DEBUG
                 fprintf(stderr,"calling command \"%s\"\n", args[0]);
+#endif
                 execvp(args[0], args);
                 fprintf(stderr, "Error calling command:\"%s\"\n", args[0]);
                 exit(1);
@@ -465,11 +536,33 @@ void startShell(int port)
                 }
             }
         }
+        
+        //end of while should always be done
         done = 0;
         if (write(cfd, "done!", strlen("done!")) < 0)
         {
+#ifdef DEBUG
+            printf("writing done!!\n");
+#endif
             die("Couldn't send message");
+        }
+        
+#ifdef DEBUG
+        fprintf(stderr, "waiting for done reply\n");
+#endif
+        if (read(cfd, command, maxCharBufferSize) < 0)
+        {
+            die("can't read done reply\n");
         }
     }
 }
 
+int endsWithDone(const char* str)
+{
+    if(strlen(str) < 5)
+    {
+        return 0;
+    }
+    int l = strlen(str);
+    return str[l-1] == '!' && str[l-2] == 'e' && str[l-3] == 'n' && str[l-4] == 'o' && str[l-5] == 'd';
+}

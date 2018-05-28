@@ -7,8 +7,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+const int PORT = 8002;
 const int maxCharBufferSize = 2000;
-const int PORT = 8000;
 #define HOST "127.0.0.1"
 
 
@@ -21,6 +21,7 @@ static void die(const char* msg)
 
 int isput(char* command);
 int isget(char* command);
+int endsWithDone(char *str);
 int main()
 {
     struct sockaddr_in staddr = {
@@ -67,13 +68,21 @@ int main()
     {
         die("Couldn't connect to socket");
     }
-    
+    char *done = malloc(maxCharBufferSize * sizeof(char));
+    if(done == NULL)
+    {
+        die("can't mallocate string\n");
+    }
     while(1)
     {
         int bytesRead;
         if ((bytesRead = read(cfd, buf, sizeof(buf)-1)) < 0)
         {
             die("Couldn't receive message");
+        }
+        if(bytesRead == 0)
+        {
+            return 0;
         }
         buf[bytesRead] = '\0';
         printf("%s/", buf);
@@ -84,30 +93,83 @@ int main()
         }
         
         //todo handle get and put separately
+        if (write(cfd, buf, strlen(buf)) < 0)
+        {
+            die("Couldn't send message");
+        }
+        if (read(cfd, done, sizeof(done)) < 0)
+        {
+            die("can't read done\n");
+        }
+        
         if(isput(buf))
         {
-            
-        }
-        else if(isget(buf))
-        {
-            
-        }
-        else
-        {
-            if (write(cfd, buf, strlen(buf)) < 0)
+            buf[strlen(buf) - 1] = '\0';
+            char *name = malloc(maxCharBufferSize * sizeof(char));
+            if(name == NULL)
+            {
+                die("can't malloc string\n");
+            }
+            name = strcpy(name, buf+4);
+#ifdef DEBUG
+            printf("%s\n", name);
+#endif
+            FILE *file = fopen(name, "r");
+            if(file == NULL)
+            {
+                die("can't open file to read");
+            }
+            while(fgets(buf, maxCharBufferSize, file) != NULL)
+            {
+#ifdef DEBUG
+                printf("writing data to file\n");
+                printf("%s\n", buf);
+#endif
+                if (write(cfd, buf, strlen(buf)) < 0)
+                {
+                    die("Couldn't send message");
+                }
+            }
+            if (write(cfd, "done!", strlen("done!")) < 0)
+            {
+                die("Couldn't send message");
+            }
+            if(read(cfd, buf, sizeof(buf) - 1) < 0)
+            {
+                die("couldn't get donereply\n");
+            }
+            //three way handshake since this will sdtart reading as next step
+            if (write(cfd, "done!", strlen("done!")) < 0)
             {
                 die("Couldn't send message");
             }
         }
+        
         while(1)
         {
+#ifdef DEBUG
+            printf("reading output\n");
+#endif
             if ((bytesRead = read(cfd, buf, sizeof(buf)-1)) < 0)
             {
                 die("Couldn't get message");
             }
-            buf[bytesRead] = '\0';
-            if(strcmp(buf, "done!") == 0)
+            if(bytesRead == 0)
             {
+                return 0;
+            }
+            buf[bytesRead] = '\0';
+            if(endsWithDone(buf))
+            {
+#ifdef DEBUG
+                printf("done reading output\n");
+#endif
+                buf[strlen(buf) - 5] = '\0';
+                printf("%s", buf);
+                if (write(cfd, "done!", strlen("done!")) < 0)
+                {
+                    die("Couldn't send message");
+                }
                 break;
             }
             printf("%s", buf);
@@ -116,13 +178,26 @@ int main()
     }
 	return 0;
 }
+
 int isput(char* command)
 {
     if(strlen(command) < 5)return 0;
     return (command[0] == 'p' && command[1] == 'u' && command[2] == 't' && command[3] == ' ');
 }
+
 int isget(char* command)
 {
     if(strlen(command) < 5)return 0;
     return (command[0] == 'g' && command[1] == 'e' && command[2] == 't' && command[3] == ' ');
 }
+
+int endsWithDone(char *str)
+{
+    if(strlen(str) < 5)
+    {
+        return 0;
+    }
+    int l = strlen(str);
+    return str[l-1] == '!' && str[l-2] == 'e' && str[l-3] == 'n' && str[l-4] == 'o' && str[l-5] == 'd';
+}
+

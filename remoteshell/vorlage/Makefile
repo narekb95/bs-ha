@@ -25,8 +25,8 @@ clean:
 	@$(MAKE) -C srv clean
 	$(RM) $(RMFILES) $(PCK)
 
-cli/client: cli/*.c cli/*.h
+cli/client: cli/*.c
 	@$(MAKE) -C $(@D)
 
-srv/server: srv/*.c srv/*.h
+srv/server: srv/*.c
 	@$(MAKE) -C $(@D)
