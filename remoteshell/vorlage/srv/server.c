@@ -1,4 +1,4 @@
-//done has always done as reply (a hand shake)
+//has always done as reply (a hand shake quasi)
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -486,6 +486,8 @@ void startShell(int port)
                 {
 #ifdef DEBUG
                     fprintf(stderr, "done writing\n");
+                    txt[strlen(txt)-5]='\0';
+                    fprintf(file, "%s", txt);
 #endif
                     if (write(cfd, "done!", strlen("done!")) < 0)
                     {
@@ -509,7 +511,42 @@ void startShell(int port)
         {
 #ifdef DEBUG
             fprintf(stderr, "get branch\n");
+            fprintf(stderr, "%s\n", args[1]);
 #endif
+            FILE *file = fopen(args[1], "r");
+            if(file == NULL)
+            {
+                die("Couldn't open file to write\n");
+                continue;
+            }
+            int bytesRead;
+            char *buf = malloc(maxCharBufferSize);
+            if(buf == NULL)
+            {
+                die("can't allocat char array\n");
+                return;
+            }
+            
+            while(fgets(buf, maxCharBufferSize, file) != NULL)
+            {
+#ifdef DEBUG
+                fprintf(stderr, "writing data to file\n");
+                fprintf(stderr, "%s\n", buf);
+#endif
+                if (write(cfd, buf, strlen(buf)) < 0)
+                {
+                    die("Couldn't send message");
+                }
+            }
+            if (write(cfd, "done!", strlen("done!")) < 0)
+            {
+                die("Couldn't send message");
+            }
+            if(read(cfd, buf, sizeof(buf) - 1) < 0)
+            {
+                die("couldn't get donereply\n");
+            }
+            fclose(file);
         }
         else
         {

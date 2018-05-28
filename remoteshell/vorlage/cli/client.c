@@ -52,7 +52,7 @@ int main()
 #endif
     close(cfd);
     
-    usleep(1000000);
+    usleep(100000);
     struct sockaddr_in addr = {
         .sin_family = AF_INET,
         .sin_port = htons(communicationport),
@@ -144,6 +144,64 @@ int main()
                 die("Couldn't send message");
             }
         }
+        
+        
+        
+        if(isget(buf))
+        {
+            buf[strlen(buf) - 1] = '\0';
+            char *name = malloc(maxCharBufferSize * sizeof(char));
+            if(name == NULL)
+            {
+                die("can't malloc string\n");
+            }
+            name = strcpy(name, buf+4);
+#ifdef DEBUG
+            printf("file name \"%s\"\n", name);
+#endif
+            FILE *file = fopen(name, "w");
+            if(file == NULL)
+            {
+                die("can't open file to read");
+            }
+            free(name);
+            char *txt = malloc(maxCharBufferSize * sizeof(char));
+            if(txt == NULL)
+            {
+                die("can't allocat char array\n");
+            }
+            while(1)
+            {
+                if ((bytesRead = read(cfd, txt, maxCharBufferSize-1)) < 0)
+                {
+                    die("Couldn't read message, please try again");
+                }
+                txt[bytesRead] = '\0';
+                if(endsWithDone(txt))//will be problematic if text was maxcharbuffersize-3 we should try to concatenate the last :/
+                {
+#ifdef DEBUG
+                    fprintf(stderr, "done writing\n");
+                    txt[strlen(txt)-5]='\0';
+                    fprintf(file, "%s", txt);
+#endif
+                    if (write(cfd, "done!", strlen("done!")) < 0)
+                    {
+                        die("couldn't reply done");
+                    }
+                    break;
+                }
+            
+#ifdef DEBUG
+                fprintf(stderr, "writing..\n");
+                fprintf(stderr, "%s", txt);
+#endif
+                fprintf(file, "%s", txt);
+            }
+            fclose(file);
+            free(txt);
+        }
+        
+        
         
         while(1)
         {
