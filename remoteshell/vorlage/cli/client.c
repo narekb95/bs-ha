@@ -7,7 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-const int PORT = 8002;
+const int PORT = 9000;
 const int maxCharBufferSize = 2000;
 #define HOST "127.0.0.1"
 

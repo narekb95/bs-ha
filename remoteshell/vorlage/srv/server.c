@@ -12,7 +12,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-const int PORT = 8002;
+const int PORT = 9000;
 const int STPORT = 5023;
 #define sep " \t"
 int done = 0;
