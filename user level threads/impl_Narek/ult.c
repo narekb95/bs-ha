@@ -1,5 +1,4 @@
 #include "ult.h"
-#include "array.h"
 #include "strukturen.h"
 
 #include <stdio.h>
@@ -12,7 +11,9 @@
 #include <ucontext.h>
 
 
-#define STACK_SIZE (64*1024)
+#define STACK_SIZE (8*1024)
+
+int exitcodes[10000];
 
 typedef struct tcb_s {
     ucontext_t context;
@@ -25,7 +26,8 @@ tcb_t *main_context, *current_context;
 enum ContextStatus {
     ext = 0, yld = 1, jn = 2, rd = 3
 } contxStatus;
-int waitingfd, waitingtid;
+int waitingfd, waitingtid, exitcode;
+
 
 int readyToRead(int fd);
 
@@ -69,6 +71,7 @@ void callnextfunction() {
             swapcontext(&main_context->context, &current_context->context);
             switch (contxStatus) {
                 case ext:
+                    exitcodes[elem->tid] = exitcode;
                     ds_removeThread(elem);
                     break;
                 case yld:
@@ -91,10 +94,11 @@ void die(char *txt) {
 }
 
 void ult_init(ult_f f) {
+    ds_initStrukts();
+    main_context = malloc(sizeof(tcb_t));
     tcb_t *tcb = malloc(sizeof(tcb_t));
-    getcontext(&tcb->context);
 
-    // create the new stack
+    getcontext(&tcb->context);
     tcb->context.uc_link = 0;
     tcb->context.uc_stack.ss_flags = 0;
     tcb->context.uc_stack.ss_size = STACK_SIZE;
@@ -102,14 +106,14 @@ void ult_init(ult_f f) {
 
 
     if (tcb->context.uc_stack.ss_sp == NULL) {
-        fprintf(stderr, "error initializing the library\n");
+        die("error initializing the library\n");
     }
     makecontext(&tcb->context, f, 0);
-
 
     threadList *thread = ds_addThread(tcb);
     tcb->tid = thread->tid;
     ds_queuepush(thread);
+
     callnextfunction();
 }
 
@@ -142,21 +146,22 @@ void ult_yield() {
 }
 
 void ult_exit(int status) {
+    printf("utl_exit %d", status);
     contxStatus = ext;
+    exitcode = status;
     swapcontext(&current_context->context, &main_context->context);
 }
 
-//[todo]  return value, set flag in exit threads when joined and check if joined before you delete them
-//should set flag on join() functions and take it out once
 int ult_join(int tid, int *status) {
-    contxStatus = jn;
-    waitingtid = tid;
-    swapcontext(&current_context->context, &main_context->context);
-    return 0;
+    if (ds_findElement(tid)) {
+        contxStatus = jn;
+        waitingtid = tid;
+        swapcontext(&current_context->context, &main_context->context);
+    }
+    return *status = exitcodes[tid];
 }
 
-//only one fd is set, it's enough to check if isTrue = 1
-//for effeciency reasons select should be called for a set over all fds we are waiting on and then check
+//for efficiency reasons select should be called for a set over all fds we are waiting on and then check
 //the set for every thread instead of calling select for every single thread
 int readyToRead(int fd) {
     fd_set rfds;
@@ -164,20 +169,19 @@ int readyToRead(int fd) {
     FD_SET(fd, &rfds);
 
     struct timeval tv;
-    tv.tv_sec = 5;
-    tv.tv_usec = 0;
+    tv.tv_sec = 0;
+    tv.tv_usec = 100000;
 
     int isReady;
 
-    if ((isReady = select(fd + 1, &rfds, NULL, NULL, NULL)) == -1) {
+    if ((isReady = select(fd + 1, &rfds, NULL, NULL, &tv)) == -1) {
         die("error calling select\n");
     }
     return isReady;
 }
 
-
 int alreadyJoined(int tid) {
-    return (ds_findElement(tid) != NULL);
+    return (ds_findElement(tid) == NULL);
 }
 
 ssize_t ult_read(int fd, void *buf, size_t size) {
@@ -185,12 +189,6 @@ ssize_t ult_read(int fd, void *buf, size_t size) {
         contxStatus = rd;
         waitingfd = fd;
         swapcontext(&current_context->context, &main_context->context);
-    } else {
-        ssize_t l;
-        if ((l = (read(fd, buf, size))) == -1) {
-            die("error while reading data\n");
-        }
-        return l;
     }
-    return 0;
+    return read(fd, buf, size);
 }

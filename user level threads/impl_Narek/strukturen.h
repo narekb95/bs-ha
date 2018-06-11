@@ -1,7 +1,7 @@
 #ifndef STRUCKT_H
 #define STRUCKT_H
 
-extern struct tcb_s;
+struct tcb_s;
 
 void ds_initStrukts();
 
@@ -13,7 +13,7 @@ typedef struct threadList_ {
 } threadList;
 threadList *threadRoot;
 
-int ds_addThread(struct tcb_s *data);
+threadList *ds_addThread(struct tcb_s *data);
 
 void ds_removeThread(threadList *elem);
 

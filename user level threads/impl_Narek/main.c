@@ -6,30 +6,11 @@
 
 #include "ult.h"
 
+
 void die(char *txt);
 
 int done;
 int dataLength;
-
-static void threadA() {
-    char *str = malloc(100 * sizeof(char));
-    while (!done) {
-        ssize_t l = ult_read(0, str, 100);
-        if (l == -1) {
-            die("error reading user input\n");
-        }
-        str[l - 1] = '\0';
-
-        if (strcmp(str, "exit") == 0) {
-            done = 1;
-            ult_exit(1);
-        } else if (strcmp(str, "stat") == 0) {
-            printf("Total data read: %d\n", dataLength);
-        } else {
-            fprintf(stderr, "command not defined\n");
-        }
-    }
-}
 
 static void threadB() {
     FILE *file = fopen("/dev/random", "r");
@@ -47,7 +28,7 @@ static void threadB() {
         die("can't malloc string");
     }
     while (!done) {
-        ssize_t l = ult_read(fd, str, 100);
+        int l = ult_read(fd, str, 100);
         if (l == -1) {
             die("error reading data\n");
         }
@@ -55,7 +36,27 @@ static void threadB() {
         fprintf(out, "%s", str);
         dataLength += l;
     }
-    ult_exit(2);
+    ult_exit(0);
+}
+
+static void threadA() {
+    char *str = malloc(100 * sizeof(char));
+    while (!done) {
+        int l = ult_read(0, str, 100);
+        if (l == -1) {
+            die("error reading user input\n");
+        }
+        str[l - 1] = '\0';
+
+        if (strcmp(str, "exit") == 0) {
+            done = 1;
+            ult_exit(0);
+        } else if (strcmp(str, "stat") == 0) {
+            printf("Total data read: %d\n", dataLength);
+        } else {
+            fprintf(stderr, "command not defined\n");
+        }
+    }
 }
 
 static void myInit() {
@@ -78,6 +79,7 @@ static void myInit() {
         printf("(status = %d)\n", status);
     }
 
+    printf("done maintreahd\n");
     ult_exit(0);
 }
 
@@ -85,5 +87,3 @@ int main() {
     ult_init(myInit);
     return 0;
 }
-
-

@@ -1,7 +1,6 @@
-#include <stdlib.h>
-#include "strukturen.h"
+#include<stdlib.h>
+#include"strukturen.h"
 
-// [todo] on exit check if element still in queue take it out
 void ds_initStrukts() {
     readBlockRoot = NULL;
     joinBlockRoot = NULL;
@@ -12,7 +11,7 @@ void ds_initStrukts() {
 
 void ds_queuepush(threadList *data) {
     queue *elem = malloc(sizeof(queue));
-    if (isQueueEmpty()) {
+    if (ds_isQueueEmpty()) {
         queueFirst = queueLast = elem;
     } else {
         queueLast->next = elem;
@@ -36,14 +35,16 @@ int ds_isQueueEmpty() {
     return (queueFirst == NULL);
 }
 
-int ds_addThread(struct tcb_s *data) {
+threadList *ds_addThread(struct tcb_s *data) {
     threadList *elem = malloc(sizeof(threadList));
     elem->next = threadRoot;
-    threadRoot->prev = elem;
+    if (threadRoot != NULL)
+        threadRoot->prev = elem;
     elem->tcb = data;
     elem->prev = NULL;
     threadRoot = elem;
-    return (elem->tid = tidCounter++);
+    elem->tid = tidCounter++;
+    return elem;
 }
 
 void ds_removeThread(threadList *elem) {
@@ -68,11 +69,11 @@ threadList *ds_findElement(int tid) {
     return NULL;
 }
 
-//read blocked
 void ds_addReadBlocked(threadList *data, int fd) {
     readBlockedList *elem = malloc(sizeof(readBlockedList));
     elem->next = readBlockRoot;
-    readBlockRoot->prev = elem;
+    if (readBlockRoot != NULL)
+        readBlockRoot->prev = elem;
     elem->data = data;
     elem->prev = NULL;
     elem->fd = fd;
@@ -83,7 +84,7 @@ void ds_removeReadBlocked(readBlockedList *elem) {
     if (elem->prev != NULL) {
         (elem->prev)->next = elem->next;
     } else {
-        readBlockRoot = elem->nxt;
+        readBlockRoot = elem->next;
     }
     if (elem->next != NULL) {
         (elem->next)->prev = elem->prev;
@@ -91,12 +92,11 @@ void ds_removeReadBlocked(readBlockedList *elem) {
     free(elem);
 }
 
-
-//joind block
 void ds_addJoinBlocked(threadList *data, int tid) {
     joinBlockedList *elem = malloc(sizeof(joinBlockedList));
     elem->next = joinBlockRoot;
-    joinBlockRoot->prev = elem;
+    if (joinBlockRoot != NULL)
+        joinBlockRoot->prev = elem;
     elem->data = data;
     elem->prev = NULL;
     elem->tid = tid;
@@ -107,7 +107,7 @@ void ds_removeJoinBlocked(joinBlockedList *elem) {
     if (elem->prev != NULL) {
         (elem->prev)->next = elem->next;
     } else {
-        joinBlockRoot = elem->nxt;
+        joinBlockRoot = elem->next;
     }
     if (elem->next != NULL) {
         (elem->next)->prev = elem->prev;
