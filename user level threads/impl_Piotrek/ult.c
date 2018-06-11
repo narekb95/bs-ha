@@ -18,7 +18,7 @@ enum threadStatus {
 /* thread control block */
 typedef struct tcb_s {
     ucontext_t ctx;
-    int status;
+    enum threadStatus status;
     int exitCode;
 } tcb_t;
 
@@ -26,11 +26,8 @@ static tcb_t *threads;
 
 
 void ult_init(ult_f f) {
-    printf("ult_init\n");
-
     //the threads array should be dynamic, in order to add many ULTs
     threads = malloc(NUMBER_OF_ALL_THREADS * sizeof(tcb_t));
-
     ult_spawn(f);
     setcontext(&threads[0].ctx);
 }
@@ -44,6 +41,7 @@ int ult_spawn(ult_f f) {
     threads[newThreadId].ctx.uc_stack.ss_size = 8192;
 
     // This is the context that will run when this thread exits
+    // thread 0 will call no other function after "exit"
     threads[newThreadId].ctx.uc_link = newThreadId > 0 ? &threads[0].ctx : 0;
 
     // Now create the new context and specify what function it should run
@@ -69,7 +67,6 @@ int ult_join(int tid, int *status) {
 }
 
 void ult_exit(int status) {
-//    printf("Exiting thread %d...\n", currentThreadId);
     threads[currentThreadId].status = FINISHED;
     threads[currentThreadId].exitCode = status;
 }
