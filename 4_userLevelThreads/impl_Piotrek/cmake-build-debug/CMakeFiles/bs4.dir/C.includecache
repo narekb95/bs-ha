@@ -6,9 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/array.c
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/array.c
 array.h
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/array.h
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/array.h
 stdio.h
 -
 stdlib.h
@@ -16,11 +16,11 @@ stdlib.h
 assert.h
 -
 
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/array.h
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/array.h
 stddef.h
 -
 
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/main.c
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/main.c
 stdlib.h
 -
 stdio.h
@@ -34,13 +34,13 @@ memory.h
 unistd.h
 -
 ult.h
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/ult.h
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/ult.h
 
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/ult.c
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/ult.c
 ult.h
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/ult.h
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/ult.h
 array.h
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/array.h
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/array.h
 stdio.h
 -
 stdlib.h
@@ -52,7 +52,7 @@ unistd.h
 ucontext.h
 -
 
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/ult.h
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/ult.h
 sys/types.h
 -
 

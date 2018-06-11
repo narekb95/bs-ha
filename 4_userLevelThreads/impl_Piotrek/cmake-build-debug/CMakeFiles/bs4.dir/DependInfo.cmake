@@ -4,9 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/se2/git/bs-ha/user level threads/impl_Piotrek/array.c" "/home/se2/git/bs-ha/user level threads/impl_Piotrek/cmake-build-debug/CMakeFiles/bs4.dir/array.c.o"
-  "/home/se2/git/bs-ha/user level threads/impl_Piotrek/main.c" "/home/se2/git/bs-ha/user level threads/impl_Piotrek/cmake-build-debug/CMakeFiles/bs4.dir/main.c.o"
-  "/home/se2/git/bs-ha/user level threads/impl_Piotrek/ult.c" "/home/se2/git/bs-ha/user level threads/impl_Piotrek/cmake-build-debug/CMakeFiles/bs4.dir/ult.c.o"
+  "/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/array.c" "/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/cmake-build-debug/CMakeFiles/bs4.dir/array.c.o"
+  "/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/main.c" "/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/cmake-build-debug/CMakeFiles/bs4.dir/main.c.o"
+  "/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/ult.c" "/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/cmake-build-debug/CMakeFiles/bs4.dir/ult.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

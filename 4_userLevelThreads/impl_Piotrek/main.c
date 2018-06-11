@@ -8,7 +8,7 @@
 #include "ult.h"
 
 void waitForCommands();
-void processShellCommand(char *command);
+void processCommand(char *command);
 
 int charsCopied = 0;
 bool shellRunning = true;
@@ -28,7 +28,6 @@ static void shellThread() {
     puts("User Level Threads Demo");
     puts("-----------------------");
     puts("Available commands: \"stats\" and \"exit\"");
-    printWaitingChar();
     waitForCommands();
     ult_exit(111);
 }
@@ -36,21 +35,20 @@ static void shellThread() {
 void waitForCommands() {
     char command[20];
     while (shellRunning) {
+        printWaitingChar();
         ult_read(0, command, sizeof(command));
-        processShellCommand(command);
+        processCommand(command);
         memset(command, '\0', sizeof(command));
     }
 }
 
-void processShellCommand(char *command) {
+void processCommand(char *command) {
     if (strcmp(command, "stats\n") == 0) {
         printStats();
-        printWaitingChar();
     } else if (strcmp(command, "exit\n") == 0) {
         shellRunning = false;
     } else {
         printf("Unknown command: %s", command);
-        printWaitingChar();
     }
 }
 

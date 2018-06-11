@@ -1,3 +1,3 @@
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/cmake-build-debug/CMakeFiles/bs4.dir
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/se2/git/bs-ha/4_userLevelThreads/impl_Piotrek/cmake-build-debug/CMakeFiles/bs4.dir
