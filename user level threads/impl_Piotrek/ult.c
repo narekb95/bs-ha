@@ -57,18 +57,11 @@ void saveDefaultContext(ult_f f) {
 
 void setSchedulerAlarms() {
     struct sigaction sa;
-    sigset_t block_mask;
     struct itimerval timer;
-
-    /* Prepare sigmask */
-    sigemptyset (&block_mask);
-    sigaddset (&block_mask, SIGVTALRM);
-
 
     /* Install timer_handler as the signal handler for SIGVTALRM. */
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = &time_handler;
-    sa.sa_mask = block_mask;
     sa.sa_flags = 0;
 
 

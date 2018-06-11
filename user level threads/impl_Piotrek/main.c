@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include <time.h>
 #include <stdbool.h>
 #include <memory.h>
 #include <unistd.h>
@@ -57,7 +56,6 @@ static void copyThread() {
         if (readResult < 0) perror("IO read error!");
         if (writeResult < 0) perror("IO write error!");
         printf("buffer: %s\n", buffer);
-
     }
 
 //unreachable code
@@ -67,9 +65,6 @@ static void copyThread() {
 }
 
 static void myInit() {
-
-    prepareStatsFile();
-
     int tids[2], i, status;
 
     printf("spawn A\n");
@@ -93,7 +88,12 @@ static void myInit() {
 }
 
 int main() {
+    prepareStatsFile();
+    if (prepareStatsFile()) {
+        fprintf(stderr, "Error while creating stats file!");
+        return -1;
+    }
+
     ult_init(myInit);
     return 0;
 }
-

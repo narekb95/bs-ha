@@ -7,6 +7,6 @@
 
 extern volatile void printStats();
 
-extern void prepareStatsFile();
+extern int prepareStatsFile();
 
 #endif //BS4_STATS_H
