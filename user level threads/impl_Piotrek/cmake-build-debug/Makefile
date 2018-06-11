@@ -177,33 +177,6 @@ main.c.s:
 	$(MAKE) -f CMakeFiles/bs4.dir/build.make CMakeFiles/bs4.dir/main.c.s
 .PHONY : main.c.s
 
-stats.o: stats.c.o
-
-.PHONY : stats.o
-
-# target to build an object file
-stats.c.o:
-	$(MAKE) -f CMakeFiles/bs4.dir/build.make CMakeFiles/bs4.dir/stats.c.o
-.PHONY : stats.c.o
-
-stats.i: stats.c.i
-
-.PHONY : stats.i
-
-# target to preprocess a source file
-stats.c.i:
-	$(MAKE) -f CMakeFiles/bs4.dir/build.make CMakeFiles/bs4.dir/stats.c.i
-.PHONY : stats.c.i
-
-stats.s: stats.c.s
-
-.PHONY : stats.s
-
-# target to generate assembly for a file
-stats.c.s:
-	$(MAKE) -f CMakeFiles/bs4.dir/build.make CMakeFiles/bs4.dir/stats.c.s
-.PHONY : stats.c.s
-
 ult.o: ult.c.o
 
 .PHONY : ult.o
@@ -246,9 +219,6 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
-	@echo "... stats.o"
-	@echo "... stats.i"
-	@echo "... stats.s"
 	@echo "... ult.o"
 	@echo "... ult.i"
 	@echo "... ult.s"

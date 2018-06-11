@@ -9,6 +9,4 @@ add_executable(bs4
         array.h
         ult.c
         ult.h
-        stats.c
-        stats.h
         )

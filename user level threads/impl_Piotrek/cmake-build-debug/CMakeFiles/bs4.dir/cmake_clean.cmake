@@ -2,7 +2,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/bs4.dir/main.c.o"
   "CMakeFiles/bs4.dir/array.c.o"
   "CMakeFiles/bs4.dir/ult.c.o"
-  "CMakeFiles/bs4.dir/stats.c.o"
   "bs4.pdb"
   "bs4"
 )

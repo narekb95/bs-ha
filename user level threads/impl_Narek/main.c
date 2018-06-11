@@ -1,73 +1,70 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include <stdbool.h>
-#include <memory.h>
-#include <unistd.h>
+#include <time.h>
+#include<string.h>
 
 #include "ult.h"
-#include "stats.h"
 
-static bool readShellCommand();
+void die(char *txt);
 
-static void shellThread() {
-    puts("User Level Threads Demo");
-    puts("-----------------------");
-    printf("Available commands: \"stats\" and \"exit\"\n");
+int done;
+int dataLength;
 
-    while (readShellCommand());
-    ult_exit(0);
-}
-
-static bool readShellCommand() {
-    char *command[100];
-    printf("> ");
-    fgets((char *) command, sizeof(command), stdin);
-
-    if (strcmp((const char *) command, "stats\n") == 0) {
-        printStats();
-        return true;
-    } else if (strcmp((const char *) command, "exit\n") == 0) {
-        return false;
-    } else {
-        printf("Unknown command: %s", (char *) command);
-        return true;
-    }
-}
-
-static void copyThread() {
-    int devRandom = open("/dev/random", O_RDONLY);
-    if (devRandom < 0) {
-        perror("unable to open /dev/random");
-        return;
-    }
-
-    int devNull = open("/dev/null", O_WRONLY);
-    if (devNull < 0) {
-        perror("unable to open /dev/null");
-        return;
-    }
-    char buffer[1];
-    ssize_t readRes = 0;
-    do {
-        ssize_t readRes = ult_read(devRandom, &buffer, sizeof(buffer));
-        if (readRes) {
-            printf("reading success! char:%s", buffer);
-            incrementCopiedChars();
+static void threadA() {
+    char *str = malloc(100 * sizeof(char));
+    while (!done) {
+        ssize_t l = ult_read(0, str, 100);
+        if (l == -1) {
+            die("error reading user input\n");
         }
-    } while (readRes > 0);
+        str[l - 1] = '\0';
 
-    close(devRandom);
-    close(devNull);
+        if (strcmp(str, "exit") == 0) {
+            done = 1;
+            ult_exit(1);
+        } else if (strcmp(str, "stat") == 0) {
+            printf("Total data read: %d\n", dataLength);
+        } else {
+            fprintf(stderr, "command not defined\n");
+        }
+    }
+}
+
+static void threadB() {
+    FILE *file = fopen("/dev/random", "r");
+    if (file == NULL) {
+        die("can't open file to read");
+    }
+    int fd = fileno(file);
+    FILE *out = fopen("/dev/null", "w");
+    if (out == NULL) {
+        die("can't open file to write");
+    }
+
+    char *str = malloc(101 * sizeof(char));
+    if (str == NULL) {
+        die("can't malloc string");
+    }
+    while (!done) {
+        ssize_t l = ult_read(fd, str, 100);
+        if (l == -1) {
+            die("error reading data\n");
+        }
+        str[l] = '\0';
+        fprintf(out, "%s", str);
+        dataLength += l;
+    }
+    ult_exit(2);
 }
 
 static void myInit() {
     int tids[2], i, status;
 
     printf("spawn A\n");
-    tids[0] = ult_spawn(shellThread);
+    tids[0] = ult_spawn(threadA);
     printf("spawn B\n");
-    tids[1] = ult_spawn(copyThread);
+    tids[1] = ult_spawn(threadB);
 
     for (i = 0; i < 2; ++i) {
         printf("waiting for tids[%d] = %d\n", i, tids[i]);
@@ -88,3 +85,5 @@ int main() {
     ult_init(myInit);
     return 0;
 }
+
+

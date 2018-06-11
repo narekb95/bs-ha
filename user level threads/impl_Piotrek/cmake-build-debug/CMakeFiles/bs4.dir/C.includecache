@@ -35,16 +35,6 @@ unistd.h
 -
 ult.h
 /home/se2/git/bs-ha/user level threads/impl_Piotrek/ult.h
-stats.h
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/stats.h
-
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/stats.c
-stdio.h
--
-stats.h
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/stats.h
-
-/home/se2/git/bs-ha/user level threads/impl_Piotrek/stats.h
 
 /home/se2/git/bs-ha/user level threads/impl_Piotrek/ult.c
 ult.h
@@ -60,12 +50,6 @@ string.h
 unistd.h
 -
 ucontext.h
--
-stdbool.h
--
-signal.h
--
-sys/time.h
 -
 
 /home/se2/git/bs-ha/user level threads/impl_Piotrek/ult.h

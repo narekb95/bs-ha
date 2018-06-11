@@ -87,12 +87,6 @@
 		<Unit filename="/home/se2/git/bs-ha/user level threads/impl_Piotrek/main.c">
 			<Option target="bs4"/>
 		</Unit>
-		<Unit filename="/home/se2/git/bs-ha/user level threads/impl_Piotrek/stats.c">
-			<Option target="bs4"/>
-		</Unit>
-		<Unit filename="/home/se2/git/bs-ha/user level threads/impl_Piotrek/stats.h">
-			<Option target="bs4"/>
-		</Unit>
 		<Unit filename="/home/se2/git/bs-ha/user level threads/impl_Piotrek/ult.c">
 			<Option target="bs4"/>
 		</Unit>

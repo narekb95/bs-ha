@@ -5,11 +5,7 @@ CMakeFiles/bs4.dir/array.c.o: ../array.c
 CMakeFiles/bs4.dir/array.c.o: ../array.h
 
 CMakeFiles/bs4.dir/main.c.o: ../main.c
-CMakeFiles/bs4.dir/main.c.o: ../stats.h
 CMakeFiles/bs4.dir/main.c.o: ../ult.h
-
-CMakeFiles/bs4.dir/stats.c.o: ../stats.c
-CMakeFiles/bs4.dir/stats.c.o: ../stats.h
 
 CMakeFiles/bs4.dir/ult.c.o: ../array.h
 CMakeFiles/bs4.dir/ult.c.o: ../ult.c
