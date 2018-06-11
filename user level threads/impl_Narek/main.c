@@ -1,22 +1,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include <time.h>
 #include <stdbool.h>
 #include <memory.h>
+#include <unistd.h>
 
 #include "ult.h"
+#include "stats.h"
 
 static bool readShellCommand();
-
-static void printStats();
 
 static void shellThread() {
     puts("User Level Threads Demo");
     puts("-----------------------");
-    printf("Available commands: \"stats\" or \"exit\"\n");
+    printf("Available commands: \"stats\" and \"exit\"\n");
 
-    while(readShellCommand());
+    while (readShellCommand());
     ult_exit(0);
 }
 
@@ -31,17 +30,35 @@ static bool readShellCommand() {
     } else if (strcmp((const char *) command, "exit\n") == 0) {
         return false;
     } else {
-        puts("Invalid command!");
+        printf("Unknown command: %s", (char *) command);
         return true;
     }
 }
 
-static void printStats() {
-    printf("Stats: \n");
-}
-
 static void copyThread() {
-    ult_exit(0);
+    int devRandom = open("/dev/random", O_RDONLY);
+    if (devRandom < 0) {
+        perror("unable to open /dev/random");
+        return;
+    }
+
+    int devNull = open("/dev/null", O_WRONLY);
+    if (devNull < 0) {
+        perror("unable to open /dev/null");
+        return;
+    }
+    char buffer[1];
+    ssize_t readRes = 0;
+    do {
+        ssize_t readRes = ult_read(devRandom, &buffer, sizeof(buffer));
+        if (readRes) {
+            printf("reading success! char:%s", buffer);
+            incrementCopiedChars();
+        }
+    } while (readRes > 0);
+
+    close(devRandom);
+    close(devNull);
 }
 
 static void myInit() {
@@ -71,4 +88,3 @@ int main() {
     ult_init(myInit);
     return 0;
 }
-

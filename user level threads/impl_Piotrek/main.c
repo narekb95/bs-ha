@@ -48,20 +48,48 @@ static void copyThread() {
         return;
     }
 
-    char buffer[1];
-    while (true) {
-        ssize_t readResult = read(devRandom, buffer, sizeof(buffer));
-        ssize_t writeResult = write(devNull, buffer, sizeof(buffer));
+    struct timeval tv;
+    int retval;
+    fd_set rfds;
 
-        if (readResult < 0) perror("IO read error!");
-        if (writeResult < 0) perror("IO write error!");
-        printf("buffer: %s\n", buffer);
-    }
 
-//unreachable code
-//    close(devRandom);
-//    close(devNull);
+    do {
+        FD_ZERO(&rfds);
+        FD_SET(devRandom, &rfds);
 
+        /* Wait up to 100ms seconds. */
+        tv.tv_sec = 0;
+        tv.tv_usec = 100000;
+
+        retval = select(devRandom+1, &rfds, NULL, NULL, &tv);
+
+        if (retval == -1)
+            perror("select()");
+        else if (retval) {
+            char buffer[1];
+            ssize_t readResult = read(devRandom, buffer, sizeof(buffer));
+            ssize_t writeResult = write(devNull, buffer, sizeof(buffer));
+
+            if (readResult < 0) {
+                perror("IO read error!");
+                ult_exit(-1);
+            }
+            if (writeResult < 0) {
+                perror("IO write error!");
+                ult_exit(-1);
+            }
+            printf("Data is available now.\n");
+            puts(buffer);
+            incrementCopiedChars();
+        } else {
+            printf("No data within 100ms.\n");
+        }
+    } while (retval > 0);
+
+    close(devRandom);
+    close(devNull);
+    printStats(); //TODO remove this
+    ult_yield();
 }
 
 static void myInit() {
@@ -88,12 +116,6 @@ static void myInit() {
 }
 
 int main() {
-    prepareStatsFile();
-    if (prepareStatsFile()) {
-        fprintf(stderr, "Error while creating stats file!");
-        return -1;
-    }
-
     ult_init(myInit);
     return 0;
 }

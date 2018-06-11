@@ -22,6 +22,8 @@ typedef struct tcb_s {
     int retCode;
 } tcb_t;
 
+struct timeval quantum;
+
 static tcb_t *threads;
 
 void saveDefaultContext(ult_f f);
@@ -110,6 +112,7 @@ void ult_yield() {
     printf("Thread %d calling swapcontext\n", oldThreadId);
 
     swapcontext(&threads[oldThreadId].ctx, &threads[currentThreadId].ctx);
+    printf("Thread %d back from swapcontext\n", oldThreadId);
 }
 
 int ult_join(int tid, int *status) {

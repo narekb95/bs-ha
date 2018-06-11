@@ -1,0 +1,66 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/array.h
+stddef.h
+-
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/main.c
+stdlib.h
+-
+stdio.h
+-
+fcntl.h
+-
+stdbool.h
+-
+memory.h
+-
+unistd.h
+-
+ult.h
+/home/se2/git/bs-ha/user level threads/impl_Narek/ult.h
+stats.h
+/home/se2/git/bs-ha/user level threads/impl_Narek/stats.h
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/stats.h
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/strukturen.c
+stdlib.h
+-
+strukturen.h
+/home/se2/git/bs-ha/user level threads/impl_Narek/strukturen.h
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/strukturen.h
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/ult.c
+ult.h
+/home/se2/git/bs-ha/user level threads/impl_Narek/ult.h
+array.h
+/home/se2/git/bs-ha/user level threads/impl_Narek/array.h
+strukturen.h
+/home/se2/git/bs-ha/user level threads/impl_Narek/strukturen.h
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+unistd.h
+-
+fcntl.h
+-
+sys/select.h
+-
+ucontext.h
+-
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/ult.h
+sys/types.h
+-
+

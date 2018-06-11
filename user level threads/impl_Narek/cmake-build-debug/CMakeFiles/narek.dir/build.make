@@ -43,10 +43,10 @@ RM = /home/se2/Desktop/clion-2018.1.3/bin/cmake/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/se2/git/bs-ha/4_ult_Narek
+CMAKE_SOURCE_DIR = "/home/se2/git/bs-ha/user level threads/impl_Narek"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/se2/git/bs-ha/4_ult_Narek/cmake-build-debug
+CMAKE_BINARY_DIR = "/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug"
 
 # Include any dependencies generated for this target.
 include CMakeFiles/narek.dir/depend.make
@@ -59,16 +59,16 @@ include CMakeFiles/narek.dir/flags.make
 
 CMakeFiles/narek.dir/main.c.o: CMakeFiles/narek.dir/flags.make
 CMakeFiles/narek.dir/main.c.o: ../main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/se2/git/bs-ha/4_ult_Narek/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/narek.dir/main.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/narek.dir/main.c.o   -c /home/se2/git/bs-ha/4_ult_Narek/main.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/narek.dir/main.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/narek.dir/main.c.o   -c "/home/se2/git/bs-ha/user level threads/impl_Narek/main.c"
 
 CMakeFiles/narek.dir/main.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/narek.dir/main.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/se2/git/bs-ha/4_ult_Narek/main.c > CMakeFiles/narek.dir/main.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/home/se2/git/bs-ha/user level threads/impl_Narek/main.c" > CMakeFiles/narek.dir/main.c.i
 
 CMakeFiles/narek.dir/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/narek.dir/main.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/se2/git/bs-ha/4_ult_Narek/main.c -o CMakeFiles/narek.dir/main.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/home/se2/git/bs-ha/user level threads/impl_Narek/main.c" -o CMakeFiles/narek.dir/main.c.s
 
 CMakeFiles/narek.dir/main.c.o.requires:
 
@@ -83,16 +83,16 @@ CMakeFiles/narek.dir/main.c.o.provides.build: CMakeFiles/narek.dir/main.c.o
 
 CMakeFiles/narek.dir/strukturen.c.o: CMakeFiles/narek.dir/flags.make
 CMakeFiles/narek.dir/strukturen.c.o: ../strukturen.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/se2/git/bs-ha/4_ult_Narek/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/narek.dir/strukturen.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/narek.dir/strukturen.c.o   -c /home/se2/git/bs-ha/4_ult_Narek/strukturen.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/narek.dir/strukturen.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/narek.dir/strukturen.c.o   -c "/home/se2/git/bs-ha/user level threads/impl_Narek/strukturen.c"
 
 CMakeFiles/narek.dir/strukturen.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/narek.dir/strukturen.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/se2/git/bs-ha/4_ult_Narek/strukturen.c > CMakeFiles/narek.dir/strukturen.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/home/se2/git/bs-ha/user level threads/impl_Narek/strukturen.c" > CMakeFiles/narek.dir/strukturen.c.i
 
 CMakeFiles/narek.dir/strukturen.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/narek.dir/strukturen.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/se2/git/bs-ha/4_ult_Narek/strukturen.c -o CMakeFiles/narek.dir/strukturen.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/home/se2/git/bs-ha/user level threads/impl_Narek/strukturen.c" -o CMakeFiles/narek.dir/strukturen.c.s
 
 CMakeFiles/narek.dir/strukturen.c.o.requires:
 
@@ -107,16 +107,16 @@ CMakeFiles/narek.dir/strukturen.c.o.provides.build: CMakeFiles/narek.dir/struktu
 
 CMakeFiles/narek.dir/ult.c.o: CMakeFiles/narek.dir/flags.make
 CMakeFiles/narek.dir/ult.c.o: ../ult.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/se2/git/bs-ha/4_ult_Narek/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/narek.dir/ult.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/narek.dir/ult.c.o   -c /home/se2/git/bs-ha/4_ult_Narek/ult.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/narek.dir/ult.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/narek.dir/ult.c.o   -c "/home/se2/git/bs-ha/user level threads/impl_Narek/ult.c"
 
 CMakeFiles/narek.dir/ult.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/narek.dir/ult.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/se2/git/bs-ha/4_ult_Narek/ult.c > CMakeFiles/narek.dir/ult.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/home/se2/git/bs-ha/user level threads/impl_Narek/ult.c" > CMakeFiles/narek.dir/ult.c.i
 
 CMakeFiles/narek.dir/ult.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/narek.dir/ult.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/se2/git/bs-ha/4_ult_Narek/ult.c -o CMakeFiles/narek.dir/ult.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/home/se2/git/bs-ha/user level threads/impl_Narek/ult.c" -o CMakeFiles/narek.dir/ult.c.s
 
 CMakeFiles/narek.dir/ult.c.o.requires:
 
@@ -143,7 +143,7 @@ narek: CMakeFiles/narek.dir/strukturen.c.o
 narek: CMakeFiles/narek.dir/ult.c.o
 narek: CMakeFiles/narek.dir/build.make
 narek: CMakeFiles/narek.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/se2/git/bs-ha/4_ult_Narek/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable narek"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable narek"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/narek.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -162,6 +162,6 @@ CMakeFiles/narek.dir/clean:
 .PHONY : CMakeFiles/narek.dir/clean
 
 CMakeFiles/narek.dir/depend:
-	cd /home/se2/git/bs-ha/4_ult_Narek/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/se2/git/bs-ha/4_ult_Narek /home/se2/git/bs-ha/4_ult_Narek /home/se2/git/bs-ha/4_ult_Narek/cmake-build-debug /home/se2/git/bs-ha/4_ult_Narek/cmake-build-debug /home/se2/git/bs-ha/4_ult_Narek/cmake-build-debug/CMakeFiles/narek.dir/DependInfo.cmake --color=$(COLOR)
+	cd "/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/home/se2/git/bs-ha/user level threads/impl_Narek" "/home/se2/git/bs-ha/user level threads/impl_Narek" "/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug" "/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug" "/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug/CMakeFiles/narek.dir/DependInfo.cmake" --color=$(COLOR)
 .PHONY : CMakeFiles/narek.dir/depend
 
