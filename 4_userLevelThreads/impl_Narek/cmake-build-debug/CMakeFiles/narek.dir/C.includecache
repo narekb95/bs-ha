@@ -1,0 +1,54 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/main.c
+stdlib.h
+-
+stdio.h
+-
+fcntl.h
+-
+time.h
+-
+string.h
+-
+ult.h
+/home/se2/git/bs-ha/user level threads/impl_Narek/ult.h
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/strukturen.c
+stdlib.h
+-
+strukturen.h
+/home/se2/git/bs-ha/user level threads/impl_Narek/strukturen.h
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/strukturen.h
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/ult.c
+ult.h
+/home/se2/git/bs-ha/user level threads/impl_Narek/ult.h
+strukturen.h
+/home/se2/git/bs-ha/user level threads/impl_Narek/strukturen.h
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+unistd.h
+-
+fcntl.h
+-
+sys/select.h
+-
+ucontext.h
+-
+
+/home/se2/git/bs-ha/user level threads/impl_Narek/ult.h
+sys/types.h
+-
+

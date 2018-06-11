@@ -1,0 +1,4 @@
+/home/se2/Desktop/clion-2018.1.3/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" "/home/se2/git/bs-ha/user level threads/impl_Piotrek"
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/se2/git/bs-ha/user level threads/impl_Piotrek/cmake-build-debug

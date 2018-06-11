@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/narek.dir/main.c.o CMakeFiles/narek.dir/strukturen.c.o CMakeFiles/narek.dir/ult.c.o  -o narek 

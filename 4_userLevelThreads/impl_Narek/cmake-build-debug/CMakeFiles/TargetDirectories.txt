@@ -1,0 +1,3 @@
+/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/se2/git/bs-ha/user level threads/impl_Narek/cmake-build-debug/CMakeFiles/narek.dir
