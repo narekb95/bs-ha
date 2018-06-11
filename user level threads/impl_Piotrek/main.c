@@ -14,7 +14,7 @@ static bool readShellCommand();
 static void shellThread() {
     puts("User Level Threads Demo");
     puts("-----------------------");
-    printf("Available commands: \"stats\" or \"exit\"\n");
+    printf("Available commands: \"stats\" and \"exit\"\n");
 
     while (readShellCommand());
     ult_exit(0);
@@ -31,11 +31,10 @@ static bool readShellCommand() {
     } else if (strcmp((const char *) command, "exit\n") == 0) {
         return false;
     } else {
-        puts("Invalid command!");
+        printf("Unknown command: %s", (char *) command);
         return true;
     }
 }
-
 
 static void copyThread() {
     int devRandom = open("/dev/random", O_RDONLY);
