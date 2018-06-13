@@ -77,13 +77,12 @@ void die(char *txt) {
 }
 
 int readyToRead(unsigned int fd) {
+    struct timeval tv = {
+            .tv_sec = 0, .tv_usec = 0
+    };
     fd_set rfds;
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
-
-    struct timeval tv;
-    tv.tv_sec = 0;
-    tv.tv_usec = 1000;
 
     int isReady;
 
@@ -95,7 +94,7 @@ int readyToRead(unsigned int fd) {
 
 ssize_t ult_read(int fd, void *buf, size_t size) {
     if (!readyToRead((unsigned int) fd)) {
-        ult_yield();
+        ult_yield(); return 0;
     }
     return read(fd, buf, size);
 }

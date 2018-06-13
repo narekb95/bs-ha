@@ -4,19 +4,20 @@
 #include <stdbool.h>
 #include <memory.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "ult.h"
 
 void waitForCommands();
+
 void processCommand(char *command);
 
-int charsCopied = 0;
-bool shellRunning = true;
+void printStats();
 
-void printStats() {
-    printf("Stats:\n");
-    printf("Chars copied: %d\n", charsCopied);
-}
+const int BUFFER_SIZE = 1024;
+long long int charsCopied = 0;
+float timePassed = 0.0f;
+bool shellRunning = true;
 
 void printWaitingChar() {
     printf("> ");
@@ -34,11 +35,14 @@ static void shellThread() {
 
 void waitForCommands() {
     char command[20];
+    printWaitingChar();
+
     while (shellRunning) {
-        printWaitingChar();
-        ult_read(0, command, sizeof(command));
-        processCommand(command);
-        memset(command, '\0', sizeof(command));
+        if (ult_read(0, command, sizeof(command)) > 0) {
+            processCommand(command);
+            memset(command, '\0', sizeof(command));
+            printWaitingChar();
+        }
     }
 }
 
@@ -50,6 +54,21 @@ void processCommand(char *command) {
     } else {
         printf("Unknown command: %s", command);
     }
+}
+
+void printStats() {
+    printf("Stats:\n");
+    printf("Bytes copied: %lli\n", charsCopied);
+    printf("Run time:     %f s\n", timePassed);
+    printf("Throughput:   ");
+    float speed = ((float) charsCopied / timePassed);
+
+    if (speed > 1000000)
+        printf("%f MByte/s\n", speed / (1024 * 1024));
+    else if (speed > 1000)
+        printf("%f KByte/s\n", speed / 1024);
+    else
+        printf("%f Byte/s\n", speed);
 }
 
 ///////// THREAD B //////////
@@ -66,13 +85,17 @@ static void copyThread() {
         return;
     }
 
-    char buffer[1];
+    char buffer[BUFFER_SIZE];
+    clock_t startTime = clock();
+
     while (shellRunning) {
-        ult_read(devRandom, buffer, sizeof(buffer));
-        if (write(devNull, buffer, sizeof(buffer)) < 0) {
+        ult_read(devRandom, buffer, BUFFER_SIZE);
+        if (write(devNull, buffer, BUFFER_SIZE) < 0) {
             perror("error while writing to devNull");
         }
-        charsCopied++;
+        charsCopied += BUFFER_SIZE;
+        timePassed = (float) (clock() - startTime) / CLOCKS_PER_SEC;
+
     }
     ult_exit(222);
 }
