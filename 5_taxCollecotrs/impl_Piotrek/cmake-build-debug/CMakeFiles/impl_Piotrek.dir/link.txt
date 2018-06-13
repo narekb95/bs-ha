@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/impl_Piotrek.dir/tcd.c.o  -o impl_Piotrek 

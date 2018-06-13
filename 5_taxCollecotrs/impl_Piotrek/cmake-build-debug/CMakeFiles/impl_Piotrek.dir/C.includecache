@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/se2/git/bs-ha/5_taxCollecotrs/impl_Piotrek/tcd.c
+stdio.h
+-
+stdlib.h
+-
+pthread.h
+-
+sched.h
+-
+unistd.h
+-
+time.h
+-
+
